@@ -7,7 +7,6 @@ import {
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { useMacroTracker } from "@/context/MacroTrackerContext";
 
@@ -21,18 +20,6 @@ export function MacroSummaryCard() {
         protein: 0,
         carbs: 0,
         fat: 0,
-    };
-
-    // Default goals
-    const goals = {
-        calories: 2000,
-        protein: 150,
-        carbs: 200,
-        fat: 65,
-    };
-
-    const calculateProgress = (current: number, goal: number) => {
-        return Math.min((current / goal) * 100, 100);
     };
 
     const handleClick = (macro: string) => {
@@ -61,40 +48,39 @@ export function MacroSummaryCard() {
         }
     };
 
-    const renderMacroRow = (
+    const renderMacroItem = (
         label: string,
         macroKey: keyof typeof totals,
-        goal: number,
         unit: string
     ) => {
         const isEditing = editingMacro === macroKey;
         const currentVal = totals[macroKey];
 
         return (
-            <div className="space-y-2">
-                <div className="flex justify-between text-sm items-center h-8">
-                    <span>{label}</span>
-                    {isEditing ? (
-                        <Input
-                            autoFocus
-                            type="number"
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onKeyDown={(e) => handleSave(e, macroKey)}
-                            onBlur={() => setEditingMacro(null)}
-                            className="w-24 h-8 text-right"
-                            placeholder="Add/Sub"
-                        />
-                    ) : (
-                        <span
-                            className="text-muted-foreground cursor-pointer hover:text-foreground transition-colors"
-                            onClick={() => handleClick(macroKey)}
-                        >
-                            {currentVal} / {goal}{unit}
+            <div className="flex flex-col items-center p-4 rounded-lg bg-muted/50">
+                <span className="text-sm text-muted-foreground mb-1">{label}</span>
+                {isEditing ? (
+                    <Input
+                        autoFocus
+                        type="number"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyDown={(e) => handleSave(e, macroKey)}
+                        onBlur={() => setEditingMacro(null)}
+                        className="w-24 h-10 text-center text-2xl font-bold"
+                        placeholder="Add/Sub"
+                    />
+                ) : (
+                    <span
+                        className="text-3xl font-bold cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => handleClick(macroKey)}
+                    >
+                        {currentVal}
+                        <span className="text-sm font-normal text-muted-foreground ml-1">
+                            {unit}
                         </span>
-                    )}
-                </div>
-                <Progress value={calculateProgress(currentVal, goal)} />
+                    </span>
+                )}
             </div>
         );
     };
@@ -104,11 +90,13 @@ export function MacroSummaryCard() {
             <CardHeader>
                 <CardTitle>Daily Summary</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-                {renderMacroRow("Calories", "calories", goals.calories, " kcal")}
-                {renderMacroRow("Protein", "protein", goals.protein, "g")}
-                {renderMacroRow("Carbs", "carbs", goals.carbs, "g")}
-                {renderMacroRow("Fat", "fat", goals.fat, "g")}
+            <CardContent>
+                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                    {renderMacroItem("Calories", "calories", "kcal")}
+                    {renderMacroItem("Protein", "protein", "g")}
+                    {renderMacroItem("Carbs", "carbs", "g")}
+                    {renderMacroItem("Fat", "fat", "g")}
+                </div>
             </CardContent>
         </Card>
     );
