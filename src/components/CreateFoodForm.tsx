@@ -64,7 +64,6 @@ export function CreateFoodForm() {
         };
         addCustomFood(newFood);
         reset();
-        alert("Food added to library!");
     };
 
     return (

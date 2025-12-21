@@ -95,11 +95,11 @@ export function MacroSummaryCard() {
             <h2 className="text-lg font-bold mb-4 uppercase tracking-wider border-b border-border pb-2">
                 {">"} SYSTEM_STATUS // DAILY_SUMMARY
             </h2>
-            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {renderMacroItem("Calories", "calories", "kcal")}
-                {renderMacroItem("Protein", "protein", "g")}
-                {renderMacroItem("Carbs", "carbs", "g")}
-                {renderMacroItem("Fat", "fat", "g")}
+            <div className="grid grid-cols-2 gap-4">
+                {renderMacroItem("CALORIES", "calories", "kcal")}
+                {renderMacroItem("PROTEIN", "protein", "g")}
+                {renderMacroItem("CARBS", "carbs", "g")}
+                {renderMacroItem("FAT", "fat", "g")}
             </div>
         </div>
     );

@@ -48,7 +48,6 @@ export function FoodLogger() {
             logFood(selectedFoodId, parseFloat(amount), selectedFood?.servingUnit || "g");
             setAmount("");
             setSelectedFoodId("");
-            alert("Food logged!");
         }
     };
 
@@ -63,10 +62,10 @@ export function FoodLogger() {
                         {">"} Select_Source:
                     </Label>
                     <Select value={selectedFoodId} onValueChange={setSelectedFoodId}>
-                        <SelectTrigger className="w-full rounded-none border-border bg-background focus:ring-0">
+                        <SelectTrigger className="w-full rounded-none border-border bg-white focus:ring-0">
                             <SelectValue placeholder="[ SELECT_FOOD_ITEM ]" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-none border-border bg-background text-foreground">
+                        <SelectContent className="rounded-none border-border bg-white text-foreground">
                             {foodLibrary.map((food) => (
                                 <SelectItem key={food.id} value={food.id} className="focus:bg-primary focus:text-primary-foreground">
                                     {food.name} ({food.servingSize} {food.servingUnit})
@@ -96,22 +95,22 @@ export function FoodLogger() {
                         <p className="uppercase tracking-widest border-b border-dashed border-muted-foreground/50 pb-1 mb-2">
                             {">>"} PREVIEW_CALCULATION
                         </p>
-                        <div className="grid grid-cols-4 gap-2 text-center">
+                        <div className="grid grid-cols-2 gap-4 text-center">
                             <div>
                                 <div className="font-bold">{calculatedMacros.calories}</div>
-                                <div className="text-xs text-muted-foreground uppercase">Kcal</div>
+                                <div className="text-xs text-muted-foreground uppercase">CALORIES</div>
                             </div>
                             <div>
                                 <div className="font-bold">{calculatedMacros.protein}g</div>
-                                <div className="text-xs text-muted-foreground uppercase">Prot</div>
+                                <div className="text-xs text-muted-foreground uppercase">PROTEIN</div>
                             </div>
                             <div>
                                 <div className="font-bold">{calculatedMacros.carbs}g</div>
-                                <div className="text-xs text-muted-foreground uppercase">Carb</div>
+                                <div className="text-xs text-muted-foreground uppercase">CARBS</div>
                             </div>
                             <div>
                                 <div className="font-bold">{calculatedMacros.fat}g</div>
-                                <div className="text-xs text-muted-foreground uppercase">Fat</div>
+                                <div className="text-xs text-muted-foreground uppercase">FAT</div>
                             </div>
                         </div>
                     </div>
