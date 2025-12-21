@@ -63,7 +63,7 @@ export function FoodLogger() {
                         {">"} Select_Source:
                     </Label>
                     <Select value={selectedFoodId} onValueChange={setSelectedFoodId}>
-                        <SelectTrigger className="w-full rounded-none border-border bg-transparent focus:ring-0">
+                        <SelectTrigger className="w-full rounded-none border-border bg-background focus:ring-0">
                             <SelectValue placeholder="[ SELECT_FOOD_ITEM ]" />
                         </SelectTrigger>
                         <SelectContent className="rounded-none border-border bg-background text-foreground">

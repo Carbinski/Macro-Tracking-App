@@ -2,16 +2,17 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { DailyLog, FoodItem, MacroData, ConsumedItem } from "@/types";
-import { mockDb } from "@/lib/mockData";
 
 interface MacroTrackerContextType {
     dailyLog: DailyLog | null;
     foodLibrary: FoodItem[];
     selectedDate: string;
+    isLoading: boolean;
+    error: string | null;
     changeDate: (date: string) => void;
-    logFood: (foodId: string, amount: number, unit: string) => void;
-    addManualEntry: (macros: MacroData) => void;
-    addCustomFood: (food: FoodItem) => void;
+    logFood: (foodId: string, amount: number, unit: string) => Promise<void>;
+    addManualEntry: (macros: MacroData) => Promise<void>;
+    addCustomFood: (food: FoodItem) => Promise<void>;
 }
 
 const MacroTrackerContext = createContext<MacroTrackerContextType | undefined>(
@@ -28,23 +29,51 @@ export function MacroTrackerProvider({
     });
     const [dailyLog, setDailyLog] = useState<DailyLog | null>(null);
     const [foodLibrary, setFoodLibrary] = useState<FoodItem[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-    // Load initial data
+    // Load food library
     useEffect(() => {
-        setFoodLibrary(mockDb.getFoodDatabase());
+        const fetchFoods = async () => {
+            try {
+                const res = await fetch('/api/foods');
+                if (!res.ok) throw new Error('Failed to fetch foods');
+                const data = await res.json();
+                setFoodLibrary(data);
+            } catch (err) {
+                console.error(err);
+                setError('Failed to load food library');
+            }
+        };
+        fetchFoods();
     }, []);
 
     // Load daily log when date changes
     useEffect(() => {
-        const log = mockDb.getDailyLog(selectedDate);
-        setDailyLog(log);
+        const fetchLog = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const res = await fetch(`/api/logs/${selectedDate}`);
+                if (!res.ok) throw new Error('Failed to fetch daily log');
+                const data = await res.json();
+                setDailyLog(data);
+            } catch (err) {
+                console.error(err);
+                setError('Failed to load daily log');
+                setDailyLog(null);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchLog();
     }, [selectedDate]);
 
     const changeDate = (date: string) => {
         setSelectedDate(date);
     };
 
-    const logFood = (foodId: string, amount: number, unit: string) => {
+    const logFood = async (foodId: string, amount: number, unit: string) => {
         const food = foodLibrary.find((f) => f.id === foodId);
         if (!food) {
             console.error("Food not found");
@@ -62,16 +91,28 @@ export function MacroTrackerProvider({
         const consumedItem: ConsumedItem = {
             ...food,
             consumedAmount: amount,
-            servingUnit: unit, // Overwrite unit if needed, though usually same as food.servingUnit
+            servingUnit: unit,
             macros: newMacros,
         };
 
-        mockDb.logDailyEntry(selectedDate, consumedItem);
-        // Refresh log
-        setDailyLog(mockDb.getDailyLog(selectedDate));
+        try {
+            const res = await fetch('/api/logs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: selectedDate, item: consumedItem }),
+            });
+
+            if (!res.ok) throw new Error('Failed to log food');
+
+            const updatedLog = await res.json();
+            setDailyLog(updatedLog);
+        } catch (err) {
+            console.error(err);
+            setError('Failed to log food');
+        }
     };
 
-    const addManualEntry = (macros: MacroData) => {
+    const addManualEntry = async (macros: MacroData) => {
         const manualItem: ConsumedItem = {
             id: crypto.randomUUID(),
             name: "Manual Entry",
@@ -81,13 +122,46 @@ export function MacroTrackerProvider({
             macros: macros,
         };
 
-        mockDb.logDailyEntry(selectedDate, manualItem);
-        setDailyLog(mockDb.getDailyLog(selectedDate));
+        try {
+            const res = await fetch('/api/logs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: selectedDate, item: manualItem }),
+            });
+
+            if (!res.ok) throw new Error('Failed to add manual entry');
+
+            const updatedLog = await res.json();
+            setDailyLog(updatedLog);
+        } catch (err) {
+            console.error(err);
+            setError('Failed to add manual entry');
+        }
     };
 
-    const addCustomFood = (food: FoodItem) => {
-        mockDb.addCustomFood(food);
-        setFoodLibrary(mockDb.getFoodDatabase());
+    const addCustomFood = async (food: FoodItem) => {
+        try {
+            // Remove ID if it's a temp ID, let DB handle it? 
+            // Actually the API expects a FoodItem structure. 
+            // If we send an ID, Mongoose might complain if it's not an ObjectId or if we try to set _id.
+            // But our FoodItem interface has 'id'.
+            // Let's strip 'id' before sending if it's just a placeholder.
+            const { id, ...foodData } = food;
+
+            const res = await fetch('/api/foods', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(foodData),
+            });
+
+            if (!res.ok) throw new Error('Failed to add custom food');
+
+            const newFood = await res.json();
+            setFoodLibrary((prev) => [...prev, newFood]);
+        } catch (err) {
+            console.error(err);
+            setError('Failed to add custom food');
+        }
     };
 
     return (
@@ -96,6 +170,8 @@ export function MacroTrackerProvider({
                 dailyLog,
                 foodLibrary,
                 selectedDate,
+                isLoading,
+                error,
                 changeDate,
                 logFood,
                 addManualEntry,
