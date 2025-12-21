@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+// import {
+//     Card,
+//     CardContent,
+//     CardHeader,
+//     CardTitle,
+// } from "@/components/ui/card";
 import {
     Select,
     SelectContent,
@@ -53,20 +53,22 @@ export function FoodLogger() {
     };
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle>Log Food</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
+        <div className="w-full border border-border p-4 mb-4">
+            <h2 className="text-lg font-bold mb-4 uppercase tracking-wider border-b border-border pb-2">
+                {">"} SYSTEM_ACTION // LOG_FOOD
+            </h2>
+            <div className="space-y-4">
                 <div className="space-y-2">
-                    <Label>Select Food</Label>
+                    <Label className="text-sm uppercase tracking-widest text-muted-foreground">
+                        {">"} Select_Source:
+                    </Label>
                     <Select value={selectedFoodId} onValueChange={setSelectedFoodId}>
-                        <SelectTrigger>
-                            <SelectValue placeholder="Search food..." />
+                        <SelectTrigger className="w-full rounded-none border-border bg-transparent focus:ring-0">
+                            <SelectValue placeholder="[ SELECT_FOOD_ITEM ]" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="rounded-none border-border bg-background text-foreground">
                             {foodLibrary.map((food) => (
-                                <SelectItem key={food.id} value={food.id}>
+                                <SelectItem key={food.id} value={food.id} className="focus:bg-primary focus:text-primary-foreground">
                                     {food.name} ({food.servingSize} {food.servingUnit})
                                 </SelectItem>
                             ))}
@@ -76,48 +78,53 @@ export function FoodLogger() {
 
                 {selectedFood && (
                     <div className="space-y-2">
-                        <Label>Amount Consumed ({selectedFood.servingUnit})</Label>
+                        <Label className="text-sm uppercase tracking-widest text-muted-foreground">
+                            {">"} Input_Amount ({selectedFood.servingUnit}):
+                        </Label>
                         <Input
                             type="number"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            placeholder={`e.g., ${selectedFood.servingSize}`}
+                            placeholder={`_`}
+                            className="bg-transparent border-none border-b border-border rounded-none focus-visible:ring-0 px-0"
                         />
                     </div>
                 )}
 
                 {calculatedMacros && (
-                    <div className="p-4 bg-muted rounded-md space-y-2 text-sm">
-                        <p className="font-semibold">Preview:</p>
+                    <div className="p-2 border border-dashed border-muted-foreground/50 space-y-2 text-sm font-mono">
+                        <p className="uppercase tracking-widest border-b border-dashed border-muted-foreground/50 pb-1 mb-2">
+                            {">>"} PREVIEW_CALCULATION
+                        </p>
                         <div className="grid grid-cols-4 gap-2 text-center">
                             <div>
                                 <div className="font-bold">{calculatedMacros.calories}</div>
-                                <div className="text-xs text-muted-foreground">Kcal</div>
+                                <div className="text-xs text-muted-foreground uppercase">Kcal</div>
                             </div>
                             <div>
                                 <div className="font-bold">{calculatedMacros.protein}g</div>
-                                <div className="text-xs text-muted-foreground">Prot</div>
+                                <div className="text-xs text-muted-foreground uppercase">Prot</div>
                             </div>
                             <div>
                                 <div className="font-bold">{calculatedMacros.carbs}g</div>
-                                <div className="text-xs text-muted-foreground">Carbs</div>
+                                <div className="text-xs text-muted-foreground uppercase">Carb</div>
                             </div>
                             <div>
                                 <div className="font-bold">{calculatedMacros.fat}g</div>
-                                <div className="text-xs text-muted-foreground">Fat</div>
+                                <div className="text-xs text-muted-foreground uppercase">Fat</div>
                             </div>
                         </div>
                     </div>
                 )}
 
                 <Button
-                    className="w-full"
+                    className="w-full rounded-none border border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground uppercase tracking-widest font-bold"
                     disabled={!selectedFood || !amount}
                     onClick={handleLog}
                 >
-                    Add Entry
+                    [ EXECUTE_LOG ]
                 </Button>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

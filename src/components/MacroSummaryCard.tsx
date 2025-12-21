@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from "@/components/ui/card";
+// import {
+//     Card,
+//     CardContent,
+//     CardHeader,
+//     CardTitle,
+// } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useMacroTracker } from "@/context/MacroTrackerContext";
 
@@ -57,26 +57,31 @@ export function MacroSummaryCard() {
         const currentVal = totals[macroKey];
 
         return (
-            <div className="flex flex-col items-center p-4 rounded-lg bg-muted/50">
-                <span className="text-sm text-muted-foreground mb-1">{label}</span>
+            <div className="flex flex-col items-start p-2 border border-border">
+                <span className="text-xs text-muted-foreground uppercase tracking-widest mb-2">
+                    {">"} {label}
+                </span>
                 {isEditing ? (
-                    <Input
-                        autoFocus
-                        type="number"
-                        value={inputValue}
-                        onChange={(e) => setInputValue(e.target.value)}
-                        onKeyDown={(e) => handleSave(e, macroKey)}
-                        onBlur={() => setEditingMacro(null)}
-                        className="w-24 h-10 text-center text-2xl font-bold"
-                        placeholder="Add/Sub"
-                    />
+                    <div className="flex items-center w-full">
+                        <span className="mr-2 text-primary">{">"}</span>
+                        <Input
+                            autoFocus
+                            type="number"
+                            value={inputValue}
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={(e) => handleSave(e, macroKey)}
+                            onBlur={() => setEditingMacro(null)}
+                            className="h-8 bg-transparent border-none text-xl font-bold p-0 focus-visible:ring-0 rounded-none shadow-none"
+                            placeholder="_"
+                        />
+                    </div>
                 ) : (
                     <span
-                        className="text-3xl font-bold cursor-pointer hover:text-primary transition-colors"
+                        className="text-xl font-bold cursor-pointer hover:bg-primary hover:text-primary-foreground w-full px-1 transition-colors"
                         onClick={() => handleClick(macroKey)}
                     >
                         {currentVal}
-                        <span className="text-sm font-normal text-muted-foreground ml-1">
+                        <span className="text-xs font-normal ml-1 opacity-70">
                             {unit}
                         </span>
                     </span>
@@ -86,18 +91,16 @@ export function MacroSummaryCard() {
     };
 
     return (
-        <Card className="w-full">
-            <CardHeader>
-                <CardTitle>Daily Summary</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                    {renderMacroItem("Calories", "calories", "kcal")}
-                    {renderMacroItem("Protein", "protein", "g")}
-                    {renderMacroItem("Carbs", "carbs", "g")}
-                    {renderMacroItem("Fat", "fat", "g")}
-                </div>
-            </CardContent>
-        </Card>
+        <div className="w-full border border-border p-4 mb-4">
+            <h2 className="text-lg font-bold mb-4 uppercase tracking-wider border-b border-border pb-2">
+                {">"} SYSTEM_STATUS // DAILY_SUMMARY
+            </h2>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+                {renderMacroItem("Calories", "calories", "kcal")}
+                {renderMacroItem("Protein", "protein", "g")}
+                {renderMacroItem("Carbs", "carbs", "g")}
+                {renderMacroItem("Fat", "fat", "g")}
+            </div>
+        </div>
     );
 }
