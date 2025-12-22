@@ -13,6 +13,8 @@ interface MacroTrackerContextType {
     logFood: (foodId: string, amount: number, unit: string) => Promise<void>;
     addManualEntry: (macros: MacroData) => Promise<void>;
     addCustomFood: (food: FoodItem) => Promise<void>;
+    deleteFood: (foodId: string) => Promise<void>;
+    submitDay: () => Promise<void>;
 }
 
 const MacroTrackerContext = createContext<MacroTrackerContextType | undefined>(
@@ -24,9 +26,7 @@ export function MacroTrackerProvider({
 }: {
     children: React.ReactNode;
 }) {
-    const [selectedDate, setSelectedDate] = useState<string>(() => {
-        return new Date().toISOString().split("T")[0];
-    });
+    const [selectedDate, setSelectedDate] = useState<string>("current");
     const [dailyLog, setDailyLog] = useState<DailyLog | null>(null);
     const [foodLibrary, setFoodLibrary] = useState<FoodItem[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -164,6 +164,45 @@ export function MacroTrackerProvider({
         }
     };
 
+    const deleteFood = async (foodId: string) => {
+        try {
+            const res = await fetch(`/api/foods/${foodId}`, {
+                method: 'DELETE',
+            });
+
+            if (!res.ok) throw new Error('Failed to delete food');
+
+            setFoodLibrary((prev) => prev.filter((f) => f.id !== foodId));
+        } catch (err) {
+            console.error(err);
+            setError('Failed to delete food');
+        }
+    };
+
+    const submitDay = async () => {
+        try {
+            const res = await fetch('/api/submit', {
+                method: 'POST',
+            });
+
+            if (!res.ok) throw new Error('Failed to submit day');
+
+            setIsLoading(true);
+            const logRes = await fetch(`/api/logs/current`);
+            if (logRes.ok) {
+                const data = await logRes.json();
+                setDailyLog(data);
+            } else {
+                setDailyLog(null);
+            }
+            setIsLoading(false);
+
+        } catch (err) {
+            console.error(err);
+            setError('Failed to submit day');
+        }
+    };
+
     return (
         <MacroTrackerContext.Provider
             value={{
@@ -176,6 +215,8 @@ export function MacroTrackerProvider({
                 logFood,
                 addManualEntry,
                 addCustomFood,
+                deleteFood,
+                submitDay,
             }}
         >
             {children}

@@ -7,13 +7,6 @@ import React, { useState, useMemo } from "react";
 //     CardHeader,
 //     CardTitle,
 // } from "@/components/ui/card";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -23,11 +16,20 @@ export function FoodLogger() {
     const { foodLibrary, logFood } = useMacroTracker();
     const [selectedFoodId, setSelectedFoodId] = useState<string>("");
     const [amount, setAmount] = useState<string>("");
+    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [isSearching, setIsSearching] = useState<boolean>(false);
 
     const selectedFood = useMemo(
         () => foodLibrary.find((f) => f.id === selectedFoodId),
         [foodLibrary, selectedFoodId]
     );
+
+    const filteredFoods = useMemo(() => {
+        if (!searchQuery) return [];
+        return foodLibrary.filter((food) =>
+            food.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    }, [foodLibrary, searchQuery]);
 
     const calculatedMacros = useMemo(() => {
         if (!selectedFood || !amount) return null;
@@ -48,7 +50,23 @@ export function FoodLogger() {
             logFood(selectedFoodId, parseFloat(amount), selectedFood?.servingUnit || "g");
             setAmount("");
             setSelectedFoodId("");
+            setSearchQuery("");
+            setIsSearching(false);
         }
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchQuery(e.target.value);
+        setIsSearching(true);
+        if (selectedFoodId) {
+            setSelectedFoodId("");
+        }
+    };
+
+    const handleSelectFood = (food: typeof foodLibrary[0]) => {
+        setSelectedFoodId(food.id);
+        setSearchQuery(food.name);
+        setIsSearching(false);
     };
 
     return (
@@ -57,22 +75,43 @@ export function FoodLogger() {
                 {">"} SYSTEM_ACTION // LOG_FOOD
             </h2>
             <div className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-2 relative">
                     <Label className="text-sm uppercase tracking-widest text-muted-foreground">
                         {">"} Select_Source:
                     </Label>
-                    <Select value={selectedFoodId} onValueChange={setSelectedFoodId}>
-                        <SelectTrigger className="w-full rounded-none border-border bg-white focus:ring-0">
-                            <SelectValue placeholder="[ SELECT_FOOD_ITEM ]" />
-                        </SelectTrigger>
-                        <SelectContent className="rounded-none border-border bg-white text-foreground">
-                            {foodLibrary.map((food) => (
-                                <SelectItem key={food.id} value={food.id} className="focus:bg-primary focus:text-primary-foreground">
+                    <Input
+                        type="text"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onFocus={() => setIsSearching(true)}
+                        placeholder="[ TYPE_TO_SEARCH ]"
+                        className="w-full rounded-none border-border bg-white focus:ring-0"
+                    />
+
+                    {isSearching && searchQuery && filteredFoods.length > 0 && (
+                        <div
+                            className="absolute z-50 w-full mt-1 border border-border bg-white text-black max-h-60 overflow-y-auto shadow-lg"
+                            style={{ backgroundColor: 'white' }}
+                        >
+                            {filteredFoods.map((food) => (
+                                <div
+                                    key={food.id}
+                                    className="p-2 cursor-pointer hover:bg-gray-100 hover:text-black text-sm uppercase tracking-wider"
+                                    onClick={() => handleSelectFood(food)}
+                                >
                                     {food.name} ({food.servingSize} {food.servingUnit})
-                                </SelectItem>
+                                </div>
                             ))}
-                        </SelectContent>
-                    </Select>
+                        </div>
+                    )}
+                    {isSearching && searchQuery && filteredFoods.length === 0 && (
+                        <div
+                            className="absolute z-50 w-full mt-1 border border-border bg-white text-black p-2 text-sm uppercase tracking-wider shadow-lg"
+                            style={{ backgroundColor: 'white' }}
+                        >
+                            [ NO_MATCHES_FOUND ]
+                        </div>
+                    )}
                 </div>
 
                 {selectedFood && (
