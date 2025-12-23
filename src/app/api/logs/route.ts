@@ -64,3 +64,14 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Failed to log food' }, { status: 500 });
     }
 }
+
+export async function GET() {
+    try {
+        await dbConnect();
+        const logs = await DailyLog.find().sort({ date: -1 }).limit(5);
+        return NextResponse.json(logs);
+    } catch (error) {
+        console.error('Error fetching logs:', error);
+        return NextResponse.json({ error: 'Failed to fetch logs' }, { status: 500 });
+    }
+}

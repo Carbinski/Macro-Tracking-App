@@ -80,7 +80,7 @@ export function MacroSummaryCard() {
                         className="text-xl font-bold cursor-pointer hover:bg-primary hover:text-primary-foreground w-full px-1 transition-colors"
                         onClick={() => handleClick(macroKey)}
                     >
-                        {currentVal}
+                        {currentVal.toFixed(1)}
                         <span className="text-xs font-normal ml-1 opacity-70">
                             {unit}
                         </span>
