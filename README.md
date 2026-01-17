@@ -38,7 +38,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 # Project Description
 
 
-Project: Greg - Macro Nutrient Tracker
+Project: Macro Tracking App
 
 Tech Stack:
 -  Next.js 16.1.0 (React 19, App Router)
