@@ -1,3 +1,6 @@
+# Description
+I made this app for my friend to track his macros. Since in theory he will be the only person using the application, we don't need to create accounts or anything.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
