@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { MacroTrackerProvider } from "@/context/MacroTrackerContext";
 import AuthSessionProvider from "@/components/SessionProvider";
@@ -36,6 +37,7 @@ export default function RootLayout({
             </div>
           </MacroTrackerProvider>
         </AuthSessionProvider>
+        <Analytics />
       </body>
     </html>
   );
