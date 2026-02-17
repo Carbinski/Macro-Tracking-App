@@ -4,8 +4,15 @@ import { FoodLogger } from "@/components/FoodLogger";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Settings } from "lucide-react";
 import Link from "next/link";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+  if (!session?.user) redirect("/login");
+
+  const username = session.user.name?.toUpperCase() || "UNKNOWN";
+
   return (
     <div className="p-2 md:p-4 space-y-6 font-mono text-sm md:text-base">
       <header className="mb-6 border-b-2 border-primary pb-4">
@@ -18,11 +25,11 @@ export default function Home() {
           </Link>
         </div>
         <p className="text-muted-foreground mt-2">
-          {">"} USER: GREG
+          {">"} USER: {username}
           <br />
           {">"} STATUS: ONLINE
           <br />
-          {">"} SYSTEM: MACRO_TRACKER_V2.0
+          {">"} SYSTEM: MACRO_TRACKER_V3.0
         </p>
       </header>
 

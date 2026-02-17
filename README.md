@@ -59,23 +59,28 @@ Architecture:
 Frontend:
 -  Single-page application with a monochrome terminal aesthetic (black background, green terminal-style text)
 -  Context API (MacroTrackerContext) manages global state for daily logs, food library, and date selection
--  Three main interactive components:
+-  Main interactive components:
 a. MacroSummaryCard - Displays daily macro totals with inline editing capability
 b. FoodLogger - Select from food library, input amounts, preview calculated macros before logging
 c. CreateFoodForm - Add new custom foods to the library with validation
+d. Settings page - Collapsible FOOD_DATABASE_MANAGEMENT; RECENT_LOGS with weekly average and last 7 submitted logs
 
 Backend (API Routes):
 -  /api/foods - GET all foods, POST new custom food
--  /api/logs - POST food entry to daily log
+-  /api/logs - POST food entry to daily log; GET returns the last 7 **submitted** logs (each submit is a separate entry; same date can appear multiple times)
 -  /api/logs/[date] - GET daily log by date (YYYY-MM-DD format)
+-  /api/submit - POST to “submit” the current session (moves/merges current log into today’s date and creates one SubmittedLog entry)
 
 Database Schema:
 -  Food collection: Stores food items with name, servingSize, servingUnit, and nested macros (protein, carbs, fat, calories)
--  DailyLog collection: Date-keyed documents containing arrays of consumed items and calculated totalMacros
+-  DailyLog collection: Date-keyed documents (one per date, plus optional "current") containing arrays of consumed items and calculated totalMacros
+-  SubmittedLog collection: One document per submit (date + totalMacros). Multiple submits on the same calendar date create multiple documents; used for RECENT_LOGS and weekly average
 
 Key Features:
 -  Date-based food logging with automatic macro calculation
--  Food library management (fetch, create custom foods)
+-  **EXECUTE_SUBMIT_LOG**: Submits the current session to today’s date. Each submit creates a separate entry in RECENT_LOGS (same date can appear multiple times).
+-  Food library management (fetch, create custom foods); FOOD_DATABASE_MANAGEMENT section on Settings is collapsible (collapsed by default).
+-  Settings page: **RECENT_LOGS** shows weekly average (average daily macros over the last 7 submitted logs) and the last 7 submitted logs.
 -  Real-time macro preview when selecting foods
 -  Manual macro entry via inline editing in summary card
 -  Serving size conversion (user can input any amount, macros scale proportionally)
@@ -89,7 +94,7 @@ Core interfaces defined in src/types/index.ts:
 -  DailyLog - Date-specific log with items and totals
 
 Environment:
--  MongoDB Atlas connection via MONGODB_URI environment variable
+-  MongoDB Atlas connection via MONGODB_URI environment variable (MongoDB backend account: disheskindastupid@gmail.com)
 -  Connection pooling with cached connections for Next.js hot reloading
 
 Styling:

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import DailyLog from '@/models/DailyLog';
+import SubmittedLog from '@/models/SubmittedLog';
+import { auth } from '@/lib/auth';
 import { ConsumedItem, MacroData } from '@/types';
 
 function calculateTotalMacros(items: ConsumedItem[]): MacroData {
@@ -17,41 +19,42 @@ function calculateTotalMacros(items: ConsumedItem[]): MacroData {
     );
 }
 
-export async function POST(request: Request) {
+export async function POST() {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         await dbConnect();
 
-        // 1. Find the "current" session log
-        const currentLog = await DailyLog.findOne({ date: "current" });
+        const currentLog = await DailyLog.findOne({ userId, date: "current" });
 
         if (!currentLog) {
-            // Nothing to submit
             return NextResponse.json({ message: "No current session to submit" });
         }
 
-        // 2. Determine target date (today's date)
-        // Use system time for now. In a real app, might want to accept timezone from client.
         const targetDate = new Date().toISOString().split('T')[0];
 
-        // 3. Find existing log for target date
-        let targetLog = await DailyLog.findOne({ date: targetDate });
+        let targetLog = await DailyLog.findOne({ userId, date: targetDate });
 
         if (targetLog) {
-            // Merge items
             targetLog.items.push(...currentLog.items);
             targetLog.totalMacros = calculateTotalMacros(targetLog.items);
             await targetLog.save();
 
-            // Delete "current" log
-            await DailyLog.deleteOne({ date: "current" });
+            await DailyLog.deleteOne({ userId, date: "current" });
         } else {
-            // Rename "current" log to target date
-            // We can't just update the date because _id is immutable usually, but date is just a field.
-            // However, to be safe and consistent with "merge" logic:
-            // Actually, just updating the date field is fine if no doc exists with that date.
             currentLog.date = targetDate;
             await currentLog.save();
         }
+
+        await SubmittedLog.create({
+            userId,
+            date: targetDate,
+            totalMacros: currentLog.totalMacros,
+        });
 
         return NextResponse.json({ message: "Session submitted successfully", date: targetDate });
     } catch (error) {

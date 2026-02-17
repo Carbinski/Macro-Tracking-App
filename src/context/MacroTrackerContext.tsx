@@ -55,6 +55,7 @@ export function MacroTrackerProvider({
             setError(null);
             try {
                 const res = await fetch(`/api/logs/${selectedDate}`);
+                if (res.status === 401) return;          // not signed in yet
                 if (!res.ok) throw new Error('Failed to fetch daily log');
                 const data = await res.json();
                 setDailyLog(data);

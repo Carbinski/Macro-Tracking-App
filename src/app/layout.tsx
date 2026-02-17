@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { MacroTrackerProvider } from "@/context/MacroTrackerContext";
+import AuthSessionProvider from "@/components/SessionProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,11 +29,13 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <MacroTrackerProvider>
-          <div className="mx-auto max-w-md min-h-screen bg-background border-x border-border shadow-sm">
-            {children}
-          </div>
-        </MacroTrackerProvider>
+        <AuthSessionProvider>
+          <MacroTrackerProvider>
+            <div className="mx-auto max-w-md min-h-screen bg-background border-x border-border shadow-sm">
+              {children}
+            </div>
+          </MacroTrackerProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

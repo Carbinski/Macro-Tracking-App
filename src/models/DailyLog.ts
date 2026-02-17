@@ -1,9 +1,9 @@
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import { DailyLog as DailyLogType, ConsumedItem, MacroData } from '@/types';
 
-// Interface for the Mongoose document
 export interface IDailyLogDocument extends Omit<DailyLogType, 'id'>, Document {
     _id: mongoose.Types.ObjectId;
+    userId: mongoose.Types.ObjectId;
 }
 
 const MacroDataSchema = new Schema<MacroData>({
@@ -14,7 +14,7 @@ const MacroDataSchema = new Schema<MacroData>({
 }, { _id: false });
 
 const ConsumedItemSchema = new Schema<ConsumedItem>({
-    id: { type: String, required: true }, // Keep original food ID or generated ID
+    id: { type: String, required: true },
     name: { type: String, required: true },
     servingSize: { type: Number, required: true },
     servingUnit: { type: String, required: true },
@@ -23,7 +23,8 @@ const ConsumedItemSchema = new Schema<ConsumedItem>({
 }, { _id: false });
 
 const DailyLogSchema = new Schema<IDailyLogDocument>({
-    date: { type: String, required: true, unique: true, index: true }, // YYYY-MM-DD
+    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    date: { type: String, required: true, index: true },
     items: [ConsumedItemSchema],
     totalMacros: { type: MacroDataSchema, required: true },
 }, {
@@ -41,7 +42,8 @@ const DailyLogSchema = new Schema<IDailyLogDocument>({
     }
 });
 
-// Prevent model recompilation error in development
+DailyLogSchema.index({ userId: 1, date: 1 }, { unique: true });
+
 const DailyLogModel: Model<IDailyLogDocument> = mongoose.models.DailyLog || mongoose.model<IDailyLogDocument>('DailyLog', DailyLogSchema);
 
 export default DailyLogModel;

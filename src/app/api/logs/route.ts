@@ -1,28 +1,13 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import DailyLog from '@/models/DailyLog';
+import SubmittedLog from '@/models/SubmittedLog';
+import { auth } from '@/lib/auth';
 import { ConsumedItem, MacroData } from '@/types';
 
 function calculateTotalMacros(items: ConsumedItem[]): MacroData {
     return items.reduce(
         (acc, item) => {
-            // If the item has a ratio property (from legacy code), use it, otherwise calculate it
-            // However, the ConsumedItem type in Mongoose schema stores the calculated macros directly usually?
-            // Actually, in the mockData logic:
-            // const ratio = item.consumedAmount / item.servingSize;
-            // return {
-            //     protein: acc.protein + item.macros.protein * ratio,
-            //     ...
-            // };
-            // BUT, the `item.macros` passed in from the frontend (logFood) are ALREADY calculated for the consumed amount!
-            // Let's verify `MacroTrackerContext.tsx`:
-            // const newMacros: MacroData = {
-            //     protein: Number((food.macros.protein * ratio).toFixed(1)),
-            //     ...
-            // };
-            // const consumedItem: ConsumedItem = { ...macros: newMacros };
-            // So the macros in ConsumedItem ARE the totals for that entry.
-
             return {
                 protein: acc.protein + item.macros.protein,
                 carbs: acc.carbs + item.macros.carbs,
@@ -36,6 +21,12 @@ function calculateTotalMacros(items: ConsumedItem[]): MacroData {
 
 export async function POST(request: Request) {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         await dbConnect();
         const { date, item } = await request.json();
 
@@ -43,7 +34,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: 'Missing date or item' }, { status: 400 });
         }
 
-        let log = await DailyLog.findOne({ date });
+        let log = await DailyLog.findOne({ userId, date });
 
         if (log) {
             log.items.push(item);
@@ -52,6 +43,7 @@ export async function POST(request: Request) {
         } else {
             const totalMacros = calculateTotalMacros([item]);
             log = await DailyLog.create({
+                userId,
                 date,
                 items: [item],
                 totalMacros,
@@ -67,9 +59,19 @@ export async function POST(request: Request) {
 
 export async function GET() {
     try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
         await dbConnect();
-        const logs = await DailyLog.find().sort({ date: -1 }).limit(5);
-        return NextResponse.json(logs);
+        const logs = await SubmittedLog.find({ userId }).sort({ createdAt: -1 }).limit(7).lean();
+        return NextResponse.json(logs.map((doc) => ({
+            id: doc._id.toString(),
+            date: doc.date,
+            totalMacros: doc.totalMacros,
+        })));
     } catch (error) {
         console.error('Error fetching logs:', error);
         return NextResponse.json({ error: 'Failed to fetch logs' }, { status: 500 });
