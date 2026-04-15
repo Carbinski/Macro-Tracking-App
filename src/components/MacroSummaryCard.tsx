@@ -63,7 +63,7 @@ export function MacroSummaryCard() {
                 </span>
                 {isEditing ? (
                     <div className="flex items-center w-full">
-                        <span className="mr-2 text-primary">{">"}</span>
+                        <span className="mr-2 text-foreground">{">"}</span>
                         <Input
                             autoFocus
                             type="number"
@@ -77,7 +77,7 @@ export function MacroSummaryCard() {
                     </div>
                 ) : (
                     <span
-                        className="text-xl font-bold cursor-pointer hover:bg-primary hover:text-primary-foreground w-full px-1 transition-colors"
+                        className="text-xl font-bold cursor-pointer hover:bg-foreground hover:text-background w-full px-1 transition-colors"
                         onClick={() => handleClick(macroKey)}
                     >
                         {currentVal.toFixed(1)}

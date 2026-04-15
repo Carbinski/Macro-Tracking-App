@@ -20,7 +20,7 @@ export function DailyLogViewer() {
                     <div key={item.id} className="p-3 border border-border relative flex flex-col group">
                         <div className="flex justify-between items-start mb-2">
                             <div>
-                                <span className="font-bold uppercase tracking-wider text-base text-primary">
+                                <span className="font-bold uppercase tracking-wider text-base text-foreground">
                                     {">"} {item.name}
                                 </span>
                                 <div className="text-xs text-muted-foreground mt-1 uppercase tracking-widest">
