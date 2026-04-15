@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useMacroTracker } from "@/context/MacroTrackerContext";
 
 export function DailyLogViewer() {
     const { dailyLog, deleteLoggedItem, isLoading } = useMacroTracker();
+    const [isOpen, setIsOpen] = useState(false);
 
     if (!dailyLog || !dailyLog.items || dailyLog.items.length === 0) {
         return null;
@@ -12,10 +13,20 @@ export function DailyLogViewer() {
 
     return (
         <div className="w-full border border-border p-4 mb-4">
-            <h2 className="text-lg font-bold mb-4 uppercase tracking-wider border-b border-border pb-2">
-                {">"} SYSTEM_MEMORY // RECORDED_LOGS
-            </h2>
-            <div className="space-y-4">
+            <div 
+                className="flex items-center justify-between cursor-pointer flex-nowrap min-w-0"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <h2 className="text-base font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
+                    {">"} SYSTEM_MEMORY // RECORDED_LOGS
+                </h2>
+                <span className="text-foreground font-bold whitespace-nowrap ml-2 flex-shrink-0">
+                    {isOpen ? "[ - ]" : "[ + ]"}
+                </span>
+            </div>
+
+            {isOpen && (
+                <div className="mt-4 pt-4 border-t border-border space-y-4">
                 {dailyLog.items.map((item) => (
                     <div key={item.id} className="p-3 border border-border relative flex flex-col group">
                         <div className="flex justify-between items-start mb-2">
@@ -61,6 +72,7 @@ export function DailyLogViewer() {
                     </div>
                 ))}
             </div>
+            )}
         </div>
     );
 }

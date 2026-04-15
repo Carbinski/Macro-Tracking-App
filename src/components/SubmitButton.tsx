@@ -7,12 +7,12 @@ export function SubmitButton() {
     const { submitDay, isLoading } = useMacroTracker();
 
     return (
-        <div className="w-full flex justify-center mt-8 mb-12">
+        <div className="w-full mt-8 mb-12">
             <button
                 onClick={submitDay}
                 disabled={isLoading}
                 className="
-                    group relative px-8 py-3 
+                    group relative w-full py-4 
                     bg-transparent text-foreground 
                     border-2 border-foreground 
                     font-mono font-bold text-lg uppercase tracking-widest

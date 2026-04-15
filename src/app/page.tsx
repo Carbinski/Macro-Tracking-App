@@ -1,5 +1,6 @@
 import { MacroSummaryCard } from "@/components/MacroSummaryCard";
 import { DailyLogViewer } from "@/components/DailyLogViewer";
+import { ManualLogger } from "@/components/ManualLogger";
 import { CreateFoodForm } from "@/components/CreateFoodForm";
 import { FoodLogger } from "@/components/FoodLogger";
 import { FoodLibraryManager } from "@/components/FoodLibraryManager";
@@ -38,6 +39,7 @@ export default async function Home() {
       <div className="space-y-8">
         <MacroSummaryCard />
         <DailyLogViewer />
+        <ManualLogger />
         <FoodLogger />
         <CreateFoodForm />
         <FoodLibraryManager />

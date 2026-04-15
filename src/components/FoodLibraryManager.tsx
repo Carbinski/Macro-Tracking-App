@@ -14,13 +14,13 @@ export function FoodLibraryManager() {
     return (
         <div className="w-full border border-border p-4 mb-4">
             <div 
-                className="flex items-center justify-between cursor-pointer"
+                className="flex items-center justify-between cursor-pointer flex-nowrap min-w-0"
                 onClick={() => setIsOpen(!isOpen)}
             >
-                <h2 className="text-lg font-bold uppercase tracking-wider">
+                <h2 className="text-base font-bold uppercase tracking-wide whitespace-nowrap overflow-hidden text-ellipsis">
                     {">"} SYSTEM_DATABASE // FOOD_LIBRARY
                 </h2>
-                <span className="text-foreground font-bold">
+                <span className="text-foreground font-bold whitespace-nowrap ml-2 flex-shrink-0">
                     {isOpen ? "[ - ]" : "[ + ]"}
                 </span>
             </div>

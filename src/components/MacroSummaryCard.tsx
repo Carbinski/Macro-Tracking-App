@@ -1,19 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 // import {
 //     Card,
 //     CardContent,
 //     CardHeader,
 //     CardTitle,
 // } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { useMacroTracker } from "@/context/MacroTrackerContext";
 
 export function MacroSummaryCard() {
-    const { dailyLog, addManualEntry } = useMacroTracker();
-    const [editingMacro, setEditingMacro] = useState<string | null>(null);
-    const [inputValue, setInputValue] = useState("");
+    const { dailyLog } = useMacroTracker();
 
     const totals = dailyLog?.totalMacros || {
         calories: 0,
@@ -22,38 +19,13 @@ export function MacroSummaryCard() {
         fat: 0,
     };
 
-    const handleClick = (macro: string) => {
-        setEditingMacro(macro);
-        setInputValue("");
-    };
 
-    const handleSave = (e: React.KeyboardEvent<HTMLInputElement>, macro: string) => {
-        if (e.key === "Enter") {
-            const value = parseFloat(inputValue);
-            if (!isNaN(value) && value !== 0) {
-                const newMacros = {
-                    protein: 0,
-                    carbs: 0,
-                    fat: 0,
-                    calories: 0,
-                    [macro]: value,
-                };
-                addManualEntry(newMacros);
-            }
-            setEditingMacro(null);
-            setInputValue("");
-        } else if (e.key === "Escape") {
-            setEditingMacro(null);
-            setInputValue("");
-        }
-    };
 
     const renderMacroItem = (
         label: string,
         macroKey: keyof typeof totals,
         unit: string
     ) => {
-        const isEditing = editingMacro === macroKey;
         const currentVal = totals[macroKey];
 
         return (
@@ -61,31 +33,12 @@ export function MacroSummaryCard() {
                 <span className="text-xs text-muted-foreground uppercase tracking-widest mb-2">
                     {">"} {label}
                 </span>
-                {isEditing ? (
-                    <div className="flex items-center w-full">
-                        <span className="mr-2 text-foreground">{">"}</span>
-                        <Input
-                            autoFocus
-                            type="number"
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onKeyDown={(e) => handleSave(e, macroKey)}
-                            onBlur={() => setEditingMacro(null)}
-                            className="h-8 bg-transparent border-none text-xl font-bold p-0 focus-visible:ring-0 rounded-none shadow-none"
-                            placeholder="_"
-                        />
-                    </div>
-                ) : (
-                    <span
-                        className="text-xl font-bold cursor-pointer hover:bg-foreground hover:text-background w-full px-1 transition-colors"
-                        onClick={() => handleClick(macroKey)}
-                    >
-                        {currentVal.toFixed(1)}
-                        <span className="text-xs font-normal ml-1 opacity-70">
-                            {unit}
-                        </span>
+                <span className="text-xl font-bold w-full px-1 text-foreground">
+                    {currentVal.toFixed(1)}
+                    <span className="text-xs font-normal ml-1 opacity-70">
+                        {unit}
                     </span>
-                )}
+                </span>
             </div>
         );
     };
