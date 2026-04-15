@@ -57,7 +57,7 @@ export default function LoginPage() {
             <div className="w-full max-w-md border-2 border-primary p-6 space-y-6">
                 <div className="border-b-2 border-primary pb-4">
                     <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest text-primary">
-                        {">"} MACRO_TRACKER_V3.0
+                        {">"} MACRO_TRACKER_V3.1
                     </h1>
                     <p className="text-muted-foreground mt-2">
                         {">"} STATUS: AWAITING_AUTHENTICATION

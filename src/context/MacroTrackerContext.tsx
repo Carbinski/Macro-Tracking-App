@@ -14,6 +14,7 @@ interface MacroTrackerContextType {
     addManualEntry: (macros: MacroData) => Promise<void>;
     addCustomFood: (food: FoodItem) => Promise<void>;
     deleteFood: (foodId: string) => Promise<void>;
+    deleteLoggedItem: (itemId: string) => Promise<void>;
     submitDay: () => Promise<void>;
 }
 
@@ -37,11 +38,13 @@ export function MacroTrackerProvider({
         const fetchFoods = async () => {
             try {
                 const res = await fetch('/api/foods');
-                if (!res.ok) throw new Error('Failed to fetch foods');
+                if (!res.ok) {
+                    setError('Failed to fetch foods');
+                    return;
+                }
                 const data = await res.json();
                 setFoodLibrary(data);
             } catch (err) {
-                console.error(err);
                 setError('Failed to load food library');
             }
         };
@@ -180,6 +183,24 @@ export function MacroTrackerProvider({
         }
     };
 
+    const deleteLoggedItem = async (itemId: string) => {
+        try {
+            const res = await fetch('/api/logs', {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ date: selectedDate, itemId }),
+            });
+
+            if (!res.ok) throw new Error('Failed to delete log item');
+
+            const updatedLog = await res.json();
+            setDailyLog(updatedLog);
+        } catch (err) {
+            console.error(err);
+            setError('Failed to delete log item');
+        }
+    };
+
     const submitDay = async () => {
         try {
             const res = await fetch('/api/submit', {
@@ -217,6 +238,7 @@ export function MacroTrackerProvider({
                 addManualEntry,
                 addCustomFood,
                 deleteFood,
+                deleteLoggedItem,
                 submitDay,
             }}
         >

@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 import { MacroTrackerProvider } from "@/context/MacroTrackerContext";
 import AuthSessionProvider from "@/components/SessionProvider";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,17 +27,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background text-foreground`}
       >
-        <AuthSessionProvider>
-          <MacroTrackerProvider>
-            <div className="mx-auto max-w-md min-h-screen bg-background border-x border-border shadow-sm">
-              {children}
-            </div>
-          </MacroTrackerProvider>
-        </AuthSessionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthSessionProvider>
+            <MacroTrackerProvider>
+              <div className="mx-auto max-w-md min-h-screen bg-background border-x border-border shadow-sm">
+                {children}
+              </div>
+            </MacroTrackerProvider>
+          </AuthSessionProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

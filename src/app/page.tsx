@@ -1,6 +1,8 @@
 import { MacroSummaryCard } from "@/components/MacroSummaryCard";
+import { DailyLogViewer } from "@/components/DailyLogViewer";
 import { CreateFoodForm } from "@/components/CreateFoodForm";
 import { FoodLogger } from "@/components/FoodLogger";
+import { FoodLibraryManager } from "@/components/FoodLibraryManager";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Settings } from "lucide-react";
 import Link from "next/link";
@@ -15,13 +17,13 @@ export default async function Home() {
 
   return (
     <div className="p-2 md:p-4 space-y-6 font-mono text-sm md:text-base">
-      <header className="mb-6 border-b-2 border-primary pb-4">
+      <header className="mb-6 border-b-2 border-foreground pb-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest text-primary">
+          <h1 className="text-xl md:text-2xl font-bold uppercase tracking-widest text-foreground">
             {">"} TERMINAL_ACCESS_GRANTED
           </h1>
           <Link href="/settings">
-            <Settings className="h-6 w-6 text-primary hover:text-primary/80 cursor-pointer" />
+            <Settings className="h-6 w-6 text-foreground hover:text-foreground/80 cursor-pointer" />
           </Link>
         </div>
         <p className="text-muted-foreground mt-2">
@@ -29,14 +31,16 @@ export default async function Home() {
           <br />
           {">"} STATUS: ONLINE
           <br />
-          {">"} SYSTEM: MACRO_TRACKER_V3.0
+          {">"} SYSTEM: MACRO_TRACKER_V3.1
         </p>
       </header>
 
       <div className="space-y-8">
         <MacroSummaryCard />
+        <DailyLogViewer />
         <FoodLogger />
         <CreateFoodForm />
+        <FoodLibraryManager />
         <SubmitButton />
       </div>
 

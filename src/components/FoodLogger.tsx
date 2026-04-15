@@ -156,7 +156,7 @@ export function FoodLogger() {
                 )}
 
                 <Button
-                    className="w-full rounded-none border border-primary bg-transparent text-primary hover:bg-primary hover:text-primary-foreground uppercase tracking-widest font-bold"
+                    className="w-full rounded-none border border-foreground bg-transparent text-foreground hover:bg-foreground hover:text-background uppercase tracking-widest font-bold"
                     disabled={!selectedFood || !amount}
                     onClick={handleLog}
                 >

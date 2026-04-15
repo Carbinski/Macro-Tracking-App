@@ -13,10 +13,10 @@ export function SubmitButton() {
                 disabled={isLoading}
                 className="
                     group relative px-8 py-3 
-                    bg-transparent text-primary 
-                    border-2 border-primary 
+                    bg-transparent text-foreground 
+                    border-2 border-foreground 
                     font-mono font-bold text-lg uppercase tracking-widest
-                    hover:bg-primary hover:text-black
+                    hover:bg-foreground hover:text-background
                     active:translate-y-1
                     disabled:opacity-50 disabled:cursor-not-allowed
                     transition-all duration-200

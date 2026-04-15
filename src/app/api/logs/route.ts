@@ -77,3 +77,41 @@ export async function GET() {
         return NextResponse.json({ error: 'Failed to fetch logs' }, { status: 500 });
     }
 }
+
+export async function DELETE(request: Request) {
+    try {
+        const session = await auth();
+        if (!session?.user?.id) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+        const userId = session.user.id;
+
+        await dbConnect();
+        const { date, itemId } = await request.json();
+
+        if (!date || !itemId) {
+            return NextResponse.json({ error: 'Missing date or itemId' }, { status: 400 });
+        }
+
+        let log = await DailyLog.findOne({ userId, date });
+
+        if (!log) {
+            return NextResponse.json({ error: 'Log not found' }, { status: 404 });
+        }
+
+        const initialLength = log.items.length;
+        log.items = log.items.filter((item: ConsumedItem) => item.id !== itemId);
+        
+        if (log.items.length === initialLength) {
+            return NextResponse.json({ error: 'Item not found in log' }, { status: 404 });
+        }
+
+        log.totalMacros = calculateTotalMacros(log.items);
+        await log.save();
+
+        return NextResponse.json(log);
+    } catch (error) {
+        console.error('Error deleting log item:', error);
+        return NextResponse.json({ error: 'Failed to delete log item' }, { status: 500 });
+    }
+}
